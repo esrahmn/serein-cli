@@ -4,10 +4,6 @@ import sys
 from importlib import metadata
 from pathlib import Path
 
-from serein.utils.dots.legacy import LEGACY_META_PKG, detect_legacy_repo
-from serein.utils.dots.packages import ArchInstaller
-from serein.utils.dots.source import DotsSource, SourceError
-from serein.utils.dots.state import DotsState
 from serein.utils.paths import config_dir
 
 PKGS = ("serein-shell", "quickshell")
@@ -76,67 +72,31 @@ def cli_version() -> str:
         return "dev"
 
 
-def print_packages() -> tuple[str, str] | None:
+def pacman_query(package: str) -> tuple[str, str] | None:
+    """Installed (name, version) of `package` (resolving provides), or None."""
+
+    result = subprocess.run(["pacman", "-Q", package], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+    parts = result.stdout.split()
+    return (parts[0], parts[1]) if result.returncode == 0 and len(parts) >= 2 else None
+
+
+def print_packages() -> None:
     own = ("serein-cli", cli_version())
 
     if not shutil.which("pacman"):
         _header("Packages:", "not on Arch")
         _rows([own], align=True)
-        return None
+        return
 
     _header("Packages:")
-    installer = ArchInstaller("")  # Dummy helper cause we only use query
-    installed = [(pkg, installer.query(pkg)) for pkg in PKGS]
+    installed = [(pkg, pacman_query(pkg)) for pkg in PKGS]
     missing = [(pkg, "not installed") for pkg, result in installed if result is None]
     present = [result for _, result in installed if result is not None]
     _rows([own] + missing + present, align=True)
 
-    return installer.query(LEGACY_META_PKG)
-
-
-def print_legacy_install(meta_package: tuple[str, str] | None) -> None:
-    legacy_path = detect_legacy_repo()
-    if legacy_path is None and meta_package is None:
-        return
-
-    print()
-    _header("Legacy install detected:")
-    meta_row = (LEGACY_META_PKG, "not installed") if meta_package is None else meta_package
-    _rows([("Legacy dots path", str(legacy_path or "not found")), meta_row])
-    update_msg = "Please update the CLI to the latest version and run 'serein install' to update the dots."
-    if sys.stdout.isatty():
-        update_msg = f"\033[1m{update_msg}\033[0m"
-    print(f"{INDENT}{update_msg}")
-
-
-def print_dots_version() -> None:
-    state = DotsState.load()
-    if state.applied_rev is None:
-        _header("Dots:", "not installed")
-        return
-
-    _header("Dots:")
-    source = DotsSource()
-    try:
-        message = source.commit_message_at(state.applied_rev)
-    except (SourceError, FileNotFoundError):
-        message = ""
-    components = ", ".join(state.enabled_components) or "none"
-    _rows(
-        [
-            ("Commit", _commit(state.applied_rev, message)),
-            ("Components", components),
-            ("AUR helper", state.aur_helper if shutil.which("pacman") else "not on Arch"),
-        ]
-    )
-
 
 def print_version() -> None:
-    meta_package = print_packages()
-    print_legacy_install(meta_package)
-
-    print()
-    print_dots_version()
+    print_packages()
 
     print()
     try:
@@ -161,12 +121,5 @@ def print_version() -> None:
     local_shell_dir = config_dir / "quickshell/serein"
     if local_shell_dir.exists():
         print()
-        _header("Local copy of shell found:")
-        upstream_metadata = fetch_git_metadata(local_shell_dir)
-        local_metadata = fetch_git_metadata(local_shell_dir, "HEAD")
-        _rows(
-            [
-                ("Last merged upstream commit", _commit_from_meta(upstream_metadata)),
-                ("Last local commit", _commit_from_meta(local_metadata)),
-            ]
-        )
+        _header("Local copy of shell found:", "(takes precedence over the packaged one)")
+        _rows([("Last local commit", _commit_from_meta(fetch_git_metadata(local_shell_dir, "HEAD")))])

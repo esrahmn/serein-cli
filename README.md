@@ -22,8 +22,9 @@ with** the Caelestia project. All credit for the original tool goes to its autho
   `~/.local/share/serein` and `~/.cache/serein`, the same folders [serein-plugin](https://github.com/esrahmn/serein-plugin)
   reads. To bring existing Caelestia data over, run the shell's `scripts/migrate-from-caelestia.sh` once. Generated
   theme files (`caelestia.theme.css`, ...) keep their names, so existing application configs keep working.
-- `serein install` and `serein update` still deploy the *upstream* Caelestia dotfiles (they are inherited
-  as-is); Serein does not need them.
+- **`install` and `update` are removed.** In caelestia-cli they deploy the upstream Caelestia dotfiles, which Serein does
+  not use (and the code for it, `utils/dots`, is gone, along with the Nix and CI files). `serein --version` no longer
+  prints the dots/legacy sections.
 
 ## Dependencies
 
@@ -71,7 +72,8 @@ git merge upstream/main
 ```
 
 Most conflicts will be in the files that were renamed (`src/caelestia` became `src/serein`), so merge carefully
-and re-apply the `qs -c serein` and branding changes if upstream touches those lines.
+and re-apply the `qs -c serein` and branding changes if upstream touches those lines. Merging will also try to bring
+back the removed `install`/`update` code (`utils/dots`); drop it again.
 
 ## Credits and license
 

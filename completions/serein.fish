@@ -1,7 +1,7 @@
 set -l seen '__fish_seen_subcommand_from'
 set -l has_opt '__fish_contains_opt'
 
-set -l commands shell toggle scheme screenshot record clipboard emoji wallpaper resizer install update
+set -l commands shell toggle scheme screenshot record clipboard emoji wallpaper resizer
 set -l not_seen "not $seen $commands"
 
 # Disable file completions
@@ -20,8 +20,6 @@ complete -c serein -n $not_seen -a 'clipboard' -d 'Open clipboard history'
 complete -c serein -n $not_seen -a 'emoji' -d 'Emoji/glyph utilities'
 complete -c serein -n $not_seen -a 'wallpaper' -d 'Manage the wallpaper'
 complete -c serein -n $not_seen -a 'resizer' -d 'Window resizer'
-complete -c serein -n $not_seen -a 'install' -d 'Install the Caelestia dotfiles'
-complete -c serein -n $not_seen -a 'update' -d 'Update the Caelestia dotfiles'
 
 # Shell
 set -l commands mpris drawers wallpaper notifs
@@ -131,11 +129,5 @@ complete -c serein -n "$seen resizer" -a 'pip' -d 'Quick pip mode'
 complete -c serein -n "$seen resizer" -a 'active' -d 'Select the active window'
 
 # Install (component flags come from the manifest, so are not completed statically)
-complete -c serein -n "$seen install" -l 'aur-helper' -d 'The AUR helper to use' -a 'yay paru' -r
-complete -c serein -n "$seen install" -l 'enable-components' -d 'List of components to enable' -r
-complete -c serein -n "$seen install" -l 'disable-components' -d 'List of components to disable' -r
-complete -c serein -n "$seen install" -l 'noconfirm' -d 'Use defaults for all prompts'
 
 # Update
-complete -c serein -n "$seen update" -l 'aur-helper' -d 'The AUR helper to use' -a 'yay paru' -r
-complete -c serein -n "$seen update" -l 'noconfirm' -d 'Use defaults for all prompts'

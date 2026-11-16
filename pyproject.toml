@@ -21,7 +21,7 @@ source = "vcs"
 
 # No release tags in the fork yet; fall back to this until one is created
 [tool.hatch.version.raw-options]
-fallback_version = "0.1.0"
+fallback_version = "0.1.1"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/serein"]

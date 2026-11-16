@@ -10,7 +10,7 @@ from serein.utils.dots.source import DotsSource, SourceError
 from serein.utils.dots.state import DotsState
 from serein.utils.paths import config_dir
 
-PKGS = ("caelestia-shell", "quickshell")
+PKGS = ("serein-plugin", "quickshell")
 INDENT = "    "
 
 
@@ -140,7 +140,11 @@ def print_version() -> None:
 
     print()
     try:
-        shell_ver = subprocess.check_output(["/usr/lib/caelestia/version", "-s"], text=True).strip()
+        helper = next(
+            (str(p) for p in (Path("/usr/lib/serein/version"), Path.home() / ".local/lib/serein/version") if p.exists()),
+            "/usr/lib/serein/version",
+        )
+        shell_ver = subprocess.check_output([helper, "-s"], text=True).strip()
         _header("Shell:")
         print(f"{INDENT}{shell_ver}")
     except FileNotFoundError:

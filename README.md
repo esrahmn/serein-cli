@@ -17,11 +17,11 @@ with** the Caelestia project. All credit for the original tool goes to its autho
   tertiary; dark and light) and it is the default when no scheme has been set yet (upstream defaults to catppuccin).
 - The `caelestia` colour scheme is removed (`serein` replaces it). Generated Qt, Warp and Discord themes are named
   *Serein*; Zed, Pandora and Spicetify themes keep the `caelestia` name because applications select them by name.
-- Notifications are sent as `serein-cli`, and `serein --version` lists the CLI's own version first.
-- **Data paths are unchanged on purpose.** Colour schemes, wallpapers, templates and `cli.json` still live in
-  `~/.config/caelestia`, `~/.local/state/caelestia` and so on, because the Caelestia plugin that Serein reuses
-  reads the same folders. Generated theme files (`caelestia.theme.css`, ...) keep their names too, so existing
-  application configs keep working.
+- Notifications are sent as `serein-cli`, and `serein --version` lists the CLI's own version first, and the plugin helper is looked up in `/usr/lib/serein`.
+- **Data paths follow Serein**: `~/.config/serein` (including `cli.json` and `templates/`), `~/.local/state/serein`,
+  `~/.local/share/serein` and `~/.cache/serein`, the same folders [serein-plugin](https://github.com/esrahmn/serein-plugin)
+  reads. To bring existing Caelestia data over, run the shell's `scripts/migrate-from-caelestia.sh` once. Generated
+  theme files (`caelestia.theme.css`, ...) keep their names, so existing application configs keep working.
 - `serein install` and `serein update` still deploy the *upstream* Caelestia dotfiles (they are inherited
   as-is); Serein does not need them.
 

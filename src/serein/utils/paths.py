@@ -14,10 +14,10 @@ cache_dir: Path = Path(os.getenv("XDG_CACHE_HOME", Path.home() / ".cache"))
 pictures_dir: Path = Path(os.getenv("XDG_PICTURES_DIR", Path.home() / "Pictures"))
 videos_dir: Path = Path(os.getenv("XDG_VIDEOS_DIR", Path.home() / "Videos"))
 
-c_config_dir: Path = config_dir / "caelestia"
-c_data_dir: Path = data_dir / "caelestia"
-c_state_dir: Path = state_dir / "caelestia"
-c_cache_dir: Path = cache_dir / "caelestia"
+c_config_dir: Path = config_dir / "serein"
+c_data_dir: Path = data_dir / "serein"
+c_state_dir: Path = state_dir / "serein"
+c_cache_dir: Path = cache_dir / "serein"
 
 user_config_path: Path = c_config_dir / "cli.json"
 cli_data_dir: Path = Path(__file__).parent.parent / "data"

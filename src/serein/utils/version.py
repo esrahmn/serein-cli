@@ -10,7 +10,7 @@ from serein.utils.dots.source import DotsSource, SourceError
 from serein.utils.dots.state import DotsState
 from serein.utils.paths import config_dir
 
-PKGS = ("serein-plugin", "quickshell")
+PKGS = ("serein-shell", "quickshell")
 INDENT = "    "
 
 

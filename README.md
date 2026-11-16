@@ -1,272 +1,78 @@
-# caelestia-cli
+# serein-cli
 
-The main control script for the Caelestia dotfiles.
+The command line tool for the [Serein shell](https://github.com/esrahmn/serein-shell): wallpapers, colour
+schemes, screenshots, screen recording, clipboard and emoji pickers, and a handle on the running shell.
 
-<details><summary id="dependencies">External dependencies</summary>
+It is a fork of [caelestia-cli](https://github.com/caelestia-dots/cli) (GPL-3.0-only) and is **not affiliated
+with** the Caelestia project. All credit for the original tool goes to its authors; see
+[Credits and license](#credits-and-license).
 
-- [`libnotify`](https://gitlab.gnome.org/GNOME/libnotify) - sending notifications
-- [`swappy`](https://github.com/jtheoof/swappy) - screenshot editor
-- [`grim`](https://gitlab.freedesktop.org/emersion/grim) - taking screenshots
-- [`dart-sass`](https://github.com/sass/dart-sass) - discord theming
-- [`wl-clipboard`](https://github.com/bugaevc/wl-clipboard) - copying to clipboard
-- [`slurp`](https://github.com/emersion/slurp) - selecting an area
-- [`gpu-screen-recorder`](https://git.dec05eba.com/gpu-screen-recorder/about) - screen recording
-- `glib2` - closing notifications
-- [`cliphist`](https://github.com/sentriz/cliphist) - clipboard history
-- [`fuzzel`](https://codeberg.org/dnkl/fuzzel) - clipboard history/emoji picker
-- [`ffmpeg`](https://ffmpeg.org) - video wallpaper detection and colour generation
+## What is different from caelestia-cli
 
-</details>
+- The command is `serein` (module `serein`, package `serein-cli`), so it installs next to `caelestia-cli`
+  without clashing.
+- `serein shell ...` and `serein screenshot` talk to the Serein shell (`qs -c serein`) instead of
+  `qs -c caelestia`.
+- Notifications are sent as `serein-cli`, and `serein --version` lists the CLI's own version first.
+- **Data paths are unchanged on purpose.** Colour schemes, wallpapers, templates and `cli.json` still live in
+  `~/.config/caelestia`, `~/.local/state/caelestia` and so on, because the Caelestia plugin that Serein reuses
+  reads the same folders. Generated theme files (`caelestia.theme.css`, ...) keep their names too, so existing
+  application configs keep working.
+- `serein install` and `serein update` still deploy the *upstream* Caelestia dotfiles (they are inherited
+  as-is); Serein does not need them.
 
-## Installation
+## Dependencies
 
-### Arch linux
+Same as caelestia-cli: `python`, `python-pillow`, `python-materialyoucolor`, `libnotify`, `swappy`, `grim`,
+`dart-sass`, `wl-clipboard`, `slurp`, `gpu-screen-recorder`, `dconf`, `cliphist`, `fuzzel`, `git`
+(and `ffmpeg` for video wallpapers). See [upstream's list](https://github.com/caelestia-dots/cli#dependencies)
+for what each one is used for.
 
-The CLI is available from the AUR as `caelestia-cli`. You can install it with an AUR helper
-like [`yay`](https://github.com/Jguer/yay) or manually downloading the PKGBUILD and running `makepkg -si`.
+## Install
 
-A package following the latest commit also exists as `caelestia-cli-git`. This is bleeding edge
-and likely to be unstable/have bugs. Regular users are recommended to use the stable package
-(`caelestia-cli`).
-
-### Nix
-
-You can run the CLI directly via `nix run`:
-
-```sh
-nix run github:caelestia-dots/cli
-```
-
-Or add it to your system configuration:
-
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    caelestia-cli = {
-      url = "github:caelestia-dots/cli";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
-}
-```
-
-The package is available as `caelestia-cli.packages.<system>.default`, which can be added to your
-`environment.systemPackages`, `users.users.<username>.packages`, `home.packages` if using home-manager,
-or a devshell. The CLI can then be used via the `caelestia` command.
-
-> [!TIP]
-> The default package does not have the shell enabled by default, which is required for full functionality.
-> To enable the shell, use the `with-shell` package. This is the recommended installation method, as
-> the CLI exposes the shell via the `shell` subcommand, meaning there is no need for the shell package
-> to be exposed.
-
-For home-manager, you can also use the Caelestia's home manager module (explained in
-[configuring](https://github.com/caelestia-dots/shell?tab=readme-ov-file#home-manager-module)) that
-installs and configures the shell and the CLI.
-
-### Manual installation
-
-Install all [dependencies](#dependencies), then install
-[`python-build`](https://github.com/pypa/build),
-[`python-installer`](https://github.com/pypa/installer),
-[`python-hatch`](https://github.com/pypa/hatch) and
-[`python-hatch-vcs`](https://github.com/ofek/hatch-vcs).
-
-e.g. via an AUR helper (yay)
+Run it straight from a checkout:
 
 ```sh
-yay -S libnotify swappy grim dart-sass wl-clipboard slurp gpu-screen-recorder ffmpeg glib2 cliphist fuzzel python-build python-installer python-hatch python-hatch-vcs
+git clone https://github.com/esrahmn/serein-cli ~/src/serein-cli
+ln -s ~/src/serein-cli/bin/serein ~/.local/bin/serein   # needs ~/.local/bin in PATH
+serein --version
 ```
 
-Now, clone the repo, `cd` into it, build the wheel via `python -m build --wheel`
-and install it via `python -m installer dist/*.whl`. Then, to install the `fish`
-completions, copy the `completions/caelestia.fish` file to
-`/usr/share/fish/vendor_completions.d/caelestia.fish`.
+`bin/serein` follows the symlink and runs `python -m serein` from the checkout, so `git pull` is all it takes to
+update. Python 3.13 or newer is required.
 
-```sh
-git clone https://github.com/caelestia-dots/cli.git
-cd cli
-python -m build --wheel
-sudo python -m installer dist/*.whl
-sudo cp completions/caelestia.fish /usr/share/fish/vendor_completions.d/caelestia.fish
-```
-
-### Additional steps
-
-#### Auto folder colour theming
-
-For automatic Papirus folder icon colour syncing, you must have [`papirus-folders`](https://github.com/PapirusDevelopmentTeam/papirus-folders)
-installed, and `papirus-folders` must to be able to run with `sudo` without a password prompt.
-
-You can allow this by creating a sudoers file:
-
-```sh
-echo "$USER ALL=(ALL) NOPASSWD: $(which papirus-folders)" | sudo tee /etc/sudoers.d/papirus-folders
-sudo chmod 440 /etc/sudoers.d/papirus-folders
-```
-
-#### Chromium-based browser theming
-
-For live Chromium-based browser theming, the CLI must be allowed to create certain directories in `/etc`
-and write to them via `sudo` without a password prompt.
-
-You can allow this by creating a sudoers file:
-
-```fish
-# Fish shell
-for dir in /etc/chromium/policies/managed /etc/brave/policies/managed /etc/opt/chrome/policies/managed
-    echo "$USER ALL=(ALL) NOPASSWD: $(which mkdir) -p $dir" | sudo tee -a /etc/sudoers.d/caelestia-chromium
-    echo "$USER ALL=(ALL) NOPASSWD: $(which tee) $dir/caelestia.json" | sudo tee -a /etc/sudoers.d/caelestia-chromium
-end
-sudo chmod 440 /etc/sudoers.d/caelestia-chromium
-```
-
-```sh
-# Bash/other shells
-for dir in /etc/chromium/policies/managed /etc/brave/policies/managed /etc/opt/chrome/policies/managed; do
-    echo "$USER ALL=(ALL) NOPASSWD: $(which mkdir) -p $dir" | sudo tee -a /etc/sudoers.d/caelestia-chromium
-    echo "$USER ALL=(ALL) NOPASSWD: $(which tee) $dir/caelestia.json" | sudo tee -a /etc/sudoers.d/caelestia-chromium
-done
-sudo chmod 440 /etc/sudoers.d/caelestia-chromium
-```
+Optional fish completions: copy or link `completions/serein.fish` into `~/.config/fish/completions/`.
 
 ## Usage
 
-All subcommands/options can be explored via the help flag.
-
-```
-$ caelestia -h
-usage: caelestia [-h] [-v] COMMAND ...
-
-Main control script for the Caelestia dotfiles
-
-options:
-  -h, --help     show this help message and exit
-  -v, --version  print the current version
-
-subcommands:
-  valid subcommands
-
-  COMMAND        the subcommand to run
-    shell        start or message the shell
-    toggle       toggle a special workspace
-    scheme       manage the colour scheme
-    screenshot   take a screenshot
-    record       start a screen recording
-    clipboard    open clipboard history
-    emoji        emoji/glyph utilities
-    wallpaper    manage the wallpaper
-    resizer      window resizer daemon
-    install      install the Caelestia dotfiles
-    update       update the Caelestia dotfiles
+```sh
+serein shell -s                     # list the shell's IPC commands
+serein shell drawers toggle launcher
+serein scheme list
+serein wallpaper -f ~/Pictures/wall.png
+serein screenshot
+serein record
+serein clipboard
+serein emoji -p
 ```
 
-### User templates
+Run `serein <command> --help` for the options of each command.
 
-Custom user templates can be defined in `~/.config/caelestia/templates/`.
+## Keeping up with upstream
 
-#### Template syntax
-
-`{{ <color>.<format> }}`
-
-- `<color>` is a theme color role derived from the Material You color system (e.g. `primary`, `secondary`, `background`)
-- `<format>` is the output format: `hex`, `rgb`, `hsl`, or a single channel (`red`, `green`, `blue`, `hue`, `saturation`, `lightness`)
-
-#### Examples
-
-- `{{ primary.hex }}` outputs `3f4ba2`
-- `{{ primary.rgb }}` outputs `rgb(193, 132, 207)`
-- `{{ primary.red }}` outputs `193`
-- `{{ primary.hsl }}` outputs `hsl(268,41%,66%)`
-- `{{ primary.hue }}` outputs `268`
-
-Output files are written to `~/.local/state/caelestia/theme/`. You can symlink them to your desired locations.
-
-## Configuring
-
-All configuration options are in `~/.config/caelestia/cli.json`.
-
-<details><summary>Example configuration</summary>
-
-```json
-{
-    "record": {
-        "extraArgs": []
-    },
-    "wallpaper": {
-        "postHook": "echo $WALLPAPER_PATH $SCHEME_NAME $SCHEME_FLAVOUR $SCHEME_MODE $SCHEME_VARIANT $SCHEME_COLOURS"
-    },
-    "theme": {
-        "enableTerm": true,
-        "enableHypr": true,
-        "enableDiscord": true,
-        "enableSpicetify": true,
-        "enablePandora": true,
-        "enableFuzzel": true,
-        "enableBtop": true,
-        "enableNvtop": true,
-        "enableHtop": true,
-        "enableGtk": true,
-        "enableQt": true,
-        "enableWarp": true,
-        "enableChromium": true,
-        "enableZed": true,
-        "enableCava": true,
-        "iconTheme": "Papirus-Dark",
-        "iconThemeLight": "Papirus-Light",
-        "iconThemeDark": "Papirus-Dark",
-        "postHook": "echo $SCHEME_NAME $SCHEME_FLAVOUR $SCHEME_MODE $SCHEME_VARIANT $SCHEME_COLOURS"
-    },
-    "toggles": {
-        "communication": {
-            "discord": {
-                "enable": true,
-                "match": [{ "class": "discord" }],
-                "command": ["discord"],
-                "move": true
-            },
-            "whatsapp": {
-                "enable": true,
-                "match": [{ "class": "whatsapp" }],
-                "move": true
-            }
-        },
-        "music": {
-            "spotify": {
-                "enable": true,
-                "match": [{ "class": "Spotify" }, { "initialTitle": "Spotify" }, { "initialTitle": "Spotify Free" }],
-                "command": ["spicetify", "watch", "-s"],
-                "move": true
-            },
-            "feishin": {
-                "enable": true,
-                "match": [{ "class": "feishin" }],
-                "move": true
-            }
-        },
-        "sysmon": {
-            "btop": {
-                "enable": true,
-                "match": [{ "class": "btop", "title": "btop", "workspace": { "name": "special:sysmon" } }],
-                "command": ["foot", "-a", "btop", "-T", "btop", "fish", "-C", "exec btop"]
-            }
-        },
-        "todo": {
-            "todoist": {
-                "enable": true,
-                "match": [{ "class": "Todoist" }],
-                "command": ["todoist"],
-                "move": true
-            }
-        }
-    },
-    "dots": {
-        "url": "https://github.com/caelestia-dots/caelestia.git",
-        "branch": "main"
-    }
-}
+```sh
+git remote add upstream https://github.com/caelestia-dots/cli   # once
+git fetch upstream
+git merge upstream/main
 ```
 
-</details>
+Most conflicts will be in the files that were renamed (`src/caelestia` became `src/serein`), so merge carefully
+and re-apply the `qs -c serein` and branding changes if upstream touches those lines.
+
+## Credits and license
+
+serein-cli is a modified version of **caelestia-cli** (<https://github.com/caelestia-dots/cli>), copyright its
+authors, and it keeps its license.
+
+It is free software, released under the **GNU General Public License v3.0 only**; see [LICENSE](LICENSE). In line
+with the GPL, the changes made on top of caelestia-cli are summarised above and in the git history.

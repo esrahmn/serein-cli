@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# Run serein-cli straight from a checkout (also works through a symlink, e.g. ~/.local/bin/serein)
+
+dir="$(dirname "$(readlink -f "$0")")"
+PYTHONPATH="$dir/../src${PYTHONPATH:+:$PYTHONPATH}" exec python -m serein "$@"

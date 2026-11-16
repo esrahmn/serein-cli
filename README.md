@@ -13,6 +13,10 @@ with** the Caelestia project. All credit for the original tool goes to its autho
   without clashing.
 - `serein shell ...` and `serein screenshot` talk to the Serein shell (`qs -c serein`) instead of
   `qs -c caelestia`.
+- A `serein` colour scheme (`serein scheme set -n serein`: night blue slate surfaces, aqua-blue primary, periwinkle
+  tertiary; dark and light) and it is the default when no scheme has been set yet (upstream defaults to catppuccin).
+- The `caelestia` colour scheme is removed (`serein` replaces it). Generated Qt, Warp and Discord themes are named
+  *Serein*; Zed, Pandora and Spicetify themes keep the `caelestia` name because applications select them by name.
 - Notifications are sent as `serein-cli`, and `serein --version` lists the CLI's own version first.
 - **Data paths are unchanged on purpose.** Colour schemes, wallpapers, templates and `cli.json` still live in
   `~/.config/caelestia`, `~/.local/state/caelestia` and so on, because the Caelestia plugin that Serein reuses

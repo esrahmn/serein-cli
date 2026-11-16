@@ -133,8 +133,8 @@ ForegroundPositive={{ $kpositive }}
 ForegroundVisited={{ $kvisited }}
 
 [General]
-ColorScheme=Caelestia
-Name=Caelestia
+ColorScheme=Serein
+Name=Serein
 shadeSortColumn=true
 
 [KDE]

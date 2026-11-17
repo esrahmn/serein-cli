@@ -20,7 +20,7 @@ with** the Caelestia project. All credit for the original tool goes to its autho
 - Notifications are sent as `serein-cli`, and `serein --version` lists the CLI's own version first, and the plugin helper is looked up in `/usr/lib/serein`.
 - **Data paths follow Serein**: `~/.config/serein` (including `cli.json` and `templates/`), `~/.local/state/serein`,
   `~/.local/share/serein` and `~/.cache/serein`, the same folders [serein-plugin](https://github.com/esrahmn/serein-plugin)
-  reads. To bring existing Caelestia data over, run the shell's `scripts/migrate-from-caelestia.sh` once. Generated
+  reads. Generated
   theme files (`caelestia.theme.css`, ...) keep their names, so existing application configs keep working.
 - **`install` and `update` are removed.** In caelestia-cli they deploy the upstream Caelestia dotfiles, which Serein does
   not use (and the code for it, `utils/dots`, is gone, along with the Nix and CI files). `serein --version` no longer

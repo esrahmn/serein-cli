@@ -19,9 +19,9 @@ serein = "serein:main"
 [tool.hatch.version]
 source = "vcs"
 
-# No release tags in the fork yet; fall back to this until one is created
+# Only used when git metadata is missing (e.g. a source tarball); keep in step with the latest release
 [tool.hatch.version.raw-options]
-fallback_version = "0.1.1"
+fallback_version = "0.2.0"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/serein"]
